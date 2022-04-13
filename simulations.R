@@ -62,4 +62,4 @@ p_wpe <- foreach (i = 1:2) %:% #length(r)) %:%
     
 stopCluster(cl)
 
-
+saveRDS(p_wpe, "p_wpe.RDS")
