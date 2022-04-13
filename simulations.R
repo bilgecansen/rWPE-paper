@@ -1,5 +1,5 @@
 
-library(tidyverse)
+library(purrr)
 library(foreach)
 library(doSNOW)
 
