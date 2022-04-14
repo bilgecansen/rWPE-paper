@@ -1,5 +1,5 @@
 
-library(purrr)
+#library(purrr)
 library(foreach)
 library(doSNOW)
 
@@ -38,7 +38,7 @@ registerDoSNOW(cl)
 p_wpe <- foreach (i = 1:2) %:% #length(r)) %:%
   foreach (h = 1:1) %:% #length(sd)) %:%
   foreach (k = 1:1) %:% #length(ts)) %:%
-  foreach (j = 1:100, .combine = "c", .packages = "tidyverse") %dopar% {
+  foreach (j = 1:100, .combine = "c", .packages = "foreach") %dopar% {
     
     x1 <- rick_grow(mu_r = r[i], sd = sd[h], K = 1000, xi =  100, ts = 1000, burnin = 1000 - ts[k])
     while (sd(x1) < 0.001) {
@@ -47,12 +47,13 @@ p_wpe <- foreach (i = 1:2) %:% #length(r)) %:%
     #plot(x1, type = "l")
     
     x2 <- list()
-    for (h in 1:1000) {
-      x2[[h]] <- sample(x1, length(x1))
+    for (l in 1:1000) {
+      x2[[l]] <- sample(x1, length(x1))
     }
     
     x1_wpe <- PE(x = x1, weighted = T,  word_length = 3, tau = 1, tie_method = "average")
-    null_wpe <- map_dbl(x2, function(x) PE(x = x, weighted = T,  word_length = 3, tau = 1, tie_method = "average"))
+    null_wpe <- foreach(l = 1:length(x2), .combine = "c") %do% 
+      PE(x = x2[[l]], weighted = T,  word_length = 3, tau = 1, tie_method = "average")
     null_diff <- x1_wpe - null_wpe 
     p <- length(which(null_diff < 0)) / length(null_diff)
     
