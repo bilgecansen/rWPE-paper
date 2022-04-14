@@ -32,12 +32,12 @@ r <- c(0.1, 0.5, 1, 1.5, 2, 2.4, 3, 3.4)
 sd <- c(0.001, 0.1, 0.25, 0.5)
 ts <- c(10, 15, 20, 25, 30, 40, 50)
 
-cl <- makeCluster(2, types = "SOCK")
+cl <- makeCluster(28, types = "SOCK")
 registerDoSNOW(cl)
 
-p_wpe <- foreach (i = 1:2) %:% #length(r)) %:%
-  foreach (h = 1:1) %:% #length(sd)) %:%
-  foreach (k = 1:1) %:% #length(ts)) %:%
+p_wpe <- foreach (i = 1:length(r)) %:%
+  foreach (h = 1:length(sd)) %:%
+  foreach (k = 1:length(ts)) %:%
   foreach (j = 1:100, .combine = "c", .packages = "foreach") %dopar% {
     
     x1 <- rick_grow(mu_r = r[i], sd = sd[h], K = 1000, xi =  100, ts = 1000, burnin = 1000 - ts[k])
