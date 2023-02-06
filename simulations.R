@@ -53,44 +53,6 @@ wpe_wh <- foreach(k = 1:length(ss)) %do%
 pe_wh <- foreach(k = 1:length(ss)) %do%  
   get_pe_white(ss[k], sd = c(0.001, 0.01, 0.1, 0.5), perm = "white", type = "PE")
 
-
-# Permutations with random walk -------------------------------------------
-
-# Chaos
-wpe_ch_r <- foreach(k = 1:length(ss)) %do% 
-  get_pe_rick(ss[k], sd = c(0.001, 0.01, 0.1, 0.5), r = r_ch, perm = "random")
-
-pe_ch_r  <- foreach(k = 1:length(ss)) %do% 
-  get_pe_rick(ss[k], sd = c(0.001, 0.01, 0.1, 0.5), r = r_ch, perm = "random", type = "PE")
-
-# Point cycles
-wpe_pc_r  <- foreach(k = 1:length(ss)) %do% 
-  get_pe_rick(ss[k], sd = c(0.001, 0.01, 0.1, 0.5), r = r_pc, perm = "random")
-
-pe_pc_r  <- foreach(k = 1:length(ss)) %do% 
-  get_pe_rick(ss[k], sd = c(0.001, 0.01, 0.1, 0.5), r = r_pc, perm = "random", type = "PE")
-
-# Equilibrium dynamics
-wpe_eq_r  <- foreach(k = 1:length(ss)) %do% 
-  get_pe_rick(ss[k], sd = c(0.001, 0.01, 0.1, 0.5), r = r_eq, perm = "random")
-
-pe_eq_r  <- foreach(k = 1:length(ss)) %do% 
-  get_pe_rick(ss[k], sd = c(0.001, 0.01, 0.1, 0.5), r = r_eq, perm = "random", type = "PE")
-
-# Trends
-wpe_tr_r  <- foreach(k = 1:length(ss)) %do% 
-  get_pe_exp(ss[k], sd = c(0.001, 0.01, 0.1, 0.5), r = r_tr, perm = "random")
-
-pe_tr_r  <- foreach(k = 1:length(ss)) %do% 
-  get_pe_exp(ss[k], sd = c(0.001, 0.01, 0.1, 0.5), r = r_tr, perm = "random", type = "PE")
-
-# Random walk
-wpe_wh_r  <- foreach(k = 1:length(ss)) %do%  
-  get_pe_walk(ss[k], sd = c(0.001, 0.01, 0.1, 0.5), perm = "random")
-
-pe_wh_r  <- foreach(k = 1:length(ss)) %do%  
-  get_pe_walk(ss[k], sd = c(0.001, 0.01, 0.1, 0.5), perm = "random", type = "PE")
-
 res <- list(wpe_ch = wpe_ch,
             pe_ch = pe_ch,
             wpe_pc = wpe_pc,
