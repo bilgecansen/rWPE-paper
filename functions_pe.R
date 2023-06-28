@@ -46,9 +46,10 @@ calculate_pe <- function(x, m = 3, tau = 1) {
 
 random_grow <- function(x) {
   x_r <- x[2:length(x)] - x[1:(length(x)-1)]
-  x_r <- sample(x_r)
+  x_sd <- sd(x_r)
+  x_r <- rnorm(length(x_r), 0, x_sd)
   x2 <- c()
-  x2[1] <- sample(x, 1)
+  x2[1] <- x[1]
   for (t in 1:(length(x)-1)) {
     x2[t+1] <- x2[t] + x_r[t]
   }
