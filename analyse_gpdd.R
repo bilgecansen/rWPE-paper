@@ -3,8 +3,10 @@ library(tidyverse)
 library(foreach)
 
 gpdd_data <- read.csv("data.csv")
+gpdd_main <- read.csv("main.csv")
+gpdd_taxa <- read.csv("taxon.csv")
 
-source("fit_pe.R")
+source("functions_pe.R")
 
 # Filter GPDD data --------------------------------------------------------
 
@@ -26,9 +28,9 @@ idx_step <-group_by(gpdd_data1, MainID) %>%
   filter(step_skip == FALSE) %>%
   select(MainID)
 
-# No count replicated more than 15% 
 gpdd_data2 <- filter(gpdd_data1, MainID %in% idx_step$MainID)
 
+# No count replicated more than 15%
 idx_rep <- group_by(gpdd_data2, MainID) %>%
   summarise(n = table(Population)/sum(table(Population))) %>%
   summarise(rep = any(n > 0.15)) %>%
@@ -37,45 +39,246 @@ idx_rep <- group_by(gpdd_data2, MainID) %>%
 
 gpdd_data3 <- filter(gpdd_data2, MainID %in% idx_rep$MainID)
 
+# No data transformation
+gpdd_main2 <- filter(gpdd_main, MainID %in% unique(gpdd_data3$MainID))
+idx_tr <- which(gpdd_main2$SourceTransform == "None" | gpdd_main2$SourceTransformReference == "Log (e)")
+gpdd_main3 <- gpdd_main2[idx_tr,]
+
+gpdd_data4 <- filter(gpdd_data3, MainID %in% gpdd_main3$MainID)
+n2 <- table(gpdd_data4$MainID)
+
 
 # Calculate WPE for each time series --------------------------------------
 
-ts <- unique(gpdd_data3$MainID)
+ts <- unique(gpdd_data4$MainID)
 
-wpe <- foreach(i = 1:length(ts), .combine = "c") %do% {
+gpdd_wpe <- foreach(i = 1:length(ts), .combine = "c") %do% {
   
-  x <- filter(gpdd_data3, MainID == ts[i])$Population
+  x <- filter(gpdd_data4, MainID == ts[i])$Population
+  x2 <- filter(gpdd_main3, MainID == ts[i])
   
-  PE(x = x, weighted = T,  word_length = 3, tau = 1, tie_method = "average")
+  if (x2$SourceTransform == "Log") x <- exp(x)
+  
+  calculate_pe(x)[1]
   
 }
 
-ts_length <- group_by(gpdd_data3, MainID) %>%
-  summarise(n = n())
-
-plot(ts_length$n, wpe)
+gpdd_pe <- foreach(i = 1:length(ts), .combine = "c") %do% {
+  
+  x <- filter(gpdd_data4, MainID == ts[i])$Population
+  x2 <- filter(gpdd_main3, MainID == ts[i])
+  
+  if (x2$SourceTransform == "Log") x <- exp(x)
+  
+  calculate_pe(x)[2]
+  
+}
 
 
 # Apply WPE randomization test to time series  ----------------------------
 
 pb <- txtProgressBar(0, length(ts), style = 3)
 
-p <- foreach(i = 1:length(ts), .combine = "c") %do% {
+p_pe_wh <- foreach(i = 1:length(ts), .combine = "c") %do% {
   
-  x <- filter(gpdd_data3, MainID == ts[i])$Population
+  x <- filter(gpdd_data4, MainID == ts[i])$Population
+  x2 <- filter(gpdd_main3, MainID == ts[i])
   
-  x2 <- list()
-  for (h in 1:1000) {
-    x2[[h]] <- sample(x, length(x))
-  }
+  if (x2$SourceTransform == "Log") x <- exp(x)
   
-  null_wpe <- map_dbl(x2, function(x) PE(x = x, weighted = T,  word_length = 3, tau = 1, tie_method = "average"))
-  null_diff <- wpe[i] - null_wpe
+  y <- test_pe(x, n_random = 1000)
   
   setTxtProgressBar(pb, i)
   
-  length(which(null_diff < 0)) / length(null_diff)
+  return(y[3])
   
 }
 
-plot(ts_length$n, p)
+p_wpe_wh <- foreach(i = 1:length(ts), .combine = "c") %do% {
+  
+  x <- filter(gpdd_data4, MainID == ts[i])$Population
+  x2 <- filter(gpdd_main3, MainID == ts[i])
+  
+  if (x2$SourceTransform == "Log") x <- exp(x)
+  
+  y <- test_wpe(x, n_random = 1000)
+  
+  setTxtProgressBar(pb, i)
+  
+  return(y[3])
+  
+}
+
+res_gpdd<- list(p_wpe_wh = p_wpe_wh,
+                gpdd_wpe = gpdd_wpe,
+                gpdd_data = gpdd_data4)
+
+saveRDS(res_gpdd, "res_gpdd.rds")
+
+
+# Summarize predictability across taxa ------------------------------------
+
+sig_wpe_wh <- as.factor(ifelse(p_wpe_wh > 0.05 & n2 < 30, 1, ifelse(p_wpe_wh > 0.05 & n2 > 30, 2, 0)))
+
+gpdd_main4 <- filter(gpdd_main, MainID %in% gpdd_data4$MainID) %>%
+  left_join(gpdd_taxa, by = "TaxonID") %>%
+  select(MainID, TaxonID, TaxonomicClass, SourceTransform) %>%
+  add_column(p_wpe_wh = p_wpe_wh) %>%
+  add_column(sig_wpe_wh = sig_wpe_wh) %>%
+  filter(TaxonomicClass %in% c("Aves", "Insecta", "Mammalia", "Osteichthyes"))
+
+df1 <- gpdd_main4 %>%
+  mutate(TaxonomicClass = factor(TaxonomicClass, 
+                                 levels = c("Mammalia", "Aves", "Insecta", "Osteichthyes"))) %>%
+  group_by(TaxonomicClass, sig_wpe_wh) %>% 
+  summarise(n = n()) %>%
+  mutate(per = n/sum(n)) %>%
+  ungroup()
+
+theme_set(theme_bw())
+
+ggplot() + 
+  geom_col(data = df1, mapping = aes(x = TaxonomicClass, y = per, fill = sig_wpe_wh), 
+           width = 0.75, position = 'dodge', alpha = 0.8) +
+  #geom_text(aes(x = levels(df1$TaxonomicClass), y = 1.05, 
+                #label = table(df1$TaxonomicClass)), color = "black") +
+  labs(y = "Frequency") +
+  theme(legend.position = "bottom",
+        title = element_text(size = 18),
+        legend.text = element_text(size = 14),
+        axis.title.x = element_blank(),
+        axis.title.y = element_text(size = 16),
+        axis.text.y = element_text(size = 12),
+        axis.text.x = element_text(size = 14),
+        panel.border = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  scale_fill_manual(name = NULL,
+                    labels = c("1" = "p > 0.05, t < 30",
+                              "2" = "p > 0.05, t > 30",
+                              "0" ="p < 0.05"),
+                    values = c("0" = "blue4", 
+                               "1" = "darkred",
+                               "2" = "darkorchid3"))
+
+ggsave("plot_gpdd.jpeg", width = 10, height = 8, units = "in")
+
+# Statistics for manuscript results
+r1 <- filter(gpdd_main4, TaxonomicClass == "Mammalia")$sig_wpe_wh %>%
+  table()
+r1/sum(r1)  
+
+r2 <- filter(gpdd_main4, TaxonomicClass == "Aves")$sig_wpe_wh %>%
+  table()
+r2/sum(r2)
+
+r3 <- filter(gpdd_main4, TaxonomicClass == "Insecta")$sig_wpe_wh %>%
+  table()
+r3/sum(r3)
+
+r4 <- filter(gpdd_main4, TaxonomicClass == "Osteichthyes")$sig_wpe_wh %>%
+  table()
+r4/sum(r4)
+
+
+# Calculate trends --------------------------------------------------------
+
+ts2 <- unique(gpdd_main4$MainID)
+
+trends <- foreach(i = 1:length(ts2), .combine = "c") %do% {
+  
+  x <- filter(gpdd_data4, MainID == ts2[i])$Population
+  x2 <- filter(gpdd_main4, MainID == ts2[i])
+  
+  if (x2$SourceTransform == "Log") x <- exp(x)
+  
+  r <- log(x[2:length(x)]) - log(x[1:(length(x)-1)])
+  
+  r <- r[!is.infinite(r)]
+  
+  mean(r, na.rm = T)
+  
+}
+
+gpdd_main5 <- gpdd_main4 %>%
+  add_column(trends = trends)
+
+g1 <- ggplot(data = filter(gpdd_main5, TaxonomicClass ==  "Mammalia")) +
+  geom_density_ridges(mapping = aes(x = trends, y = sig_wpe_wh), size = 1.3, alpha = 0.8, rel_min_height = 0.005) +
+  labs(y = "Density", x = "Avereage Growth (log)", title = "Mammalia") #+
+  scale_fill_manual(name = NULL,
+                    labels = c("1" = "p > 0.05, t < 30",
+                               "2" = "p > 0.05, t > 30",
+                               "0" ="p < 0.05"),
+                    values = c("0" = "blue4", 
+                               "1" = "darkred",
+                               "2" = "darkorchid3")) +
+  theme(panel.border = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "none") +
+  scale_y_continuous(breaks = c(0,6,12), limits = c(0,15)) +
+  scale_x_continuous(breaks = c(-0.2,0,0.2,0.4,0.6))
+
+g2 <- ggplot(data = filter(gpdd_main5, TaxonomicClass ==  "Aves")) +
+  geom_density(mapping = aes(x = trends, fill = sig_wpe_wh), alpha = 0.8, size = 1.3) +
+  labs(y = "Density", x = "Avereage Growth (log)", title = "Aves") +
+  scale_fill_manual(name = NULL,
+                    labels = c("1" = "p > 0.05, t < 30",
+                               "2" = "p > 0.05, t > 30",
+                               "0" ="p < 0.05"),
+                    values = c("0" = "blue4", 
+                               "1" = "darkred",
+                               "2" = "darkorchid3")) +
+  theme(panel.border = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "none") +
+  scale_y_continuous(breaks = c(0,6,12), limits = c(0,15))
+
+g3 <- ggplot(data = filter(gpdd_main5, TaxonomicClass ==  "Insecta")) +
+  geom_density(mapping = aes(x = trends, fill = sig_wpe_wh), alpha = 0.8, size = 1.3) +
+  labs(y = "Density", x = "Avereage Growth (log)", title = "Insecta") +
+  scale_fill_manual(name = NULL,
+                    labels = c("1" = "p > 0.05, t < 30",
+                               "2" = "p > 0.05, t > 30",
+                               "0" ="p < 0.05"),
+                    values = c("0" = "blue4", 
+                               "1" = "darkred",
+                               "2" = "darkorchid3")) +
+  theme(panel.border = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "none") +
+  scale_x_continuous(breaks = c(-0.4, -0.2,0,0.2,0.4,0.6))
+
+g4 <- ggplot(data = filter(gpdd_main5, TaxonomicClass ==  "Osteichthyes")) +
+  geom_density(mapping = aes(x = trends, fill = sig_wpe_wh), alpha = 0.8, size = 1.3) +
+  labs(y = "Density", x = "Avereage Growth (log)", title = "Osteichthyes") +
+  scale_fill_manual(name = NULL,
+                    labels = c("1" = "p > 0.05, t < 30",
+                               "2" = "p > 0.05, t > 30",
+                               "0" ="p < 0.05"),
+                    values = c("0" = "blue4", 
+                               "1" = "darkred",
+                               "2" = "darkorchid3")) +
+  theme(panel.border = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "none") +
+  scale_y_continuous(breaks = c(0,3,6))
+
+ggplot(data = filter(gpdd_main5, TaxonomicClass ==  "Mammalia")) +
+  geom_density(mapping = aes(x = trends, fill = sig_wpe_wh), size = 1.3, alpha = 0.8) +
+  labs(y = "Density", x = "Avereage Growth (log)") +
+  scale_fill_manual(name = NULL,
+                    labels = c("1" = "p > 0.05, t < 30",
+                               "2" = "p > 0.05, t > 30",
+                               "0" ="p < 0.05"),
+                    values = c("0" = "blue4", 
+                               "1" = "darkred",
+                               "2" = "darkorchid3")) +
+  theme(panel.border = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "bottom")
+ggsave("lgd.jpeg", width = 10, height = 8, units = "in")
+
+
+(g1 + g2) / (g3 + g4)
+ggsave("plot_gpdd_trends.jpeg", width = 10, height = 8, units = "in")
