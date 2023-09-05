@@ -1,6 +1,7 @@
 
 library(tidyverse)
 library(patchwork)
+library(foreach)
 
 source("functions_pop.R")
 source("functions_pe.R")
@@ -16,8 +17,8 @@ res <- readRDS("results_sim.rds")
 
 plot_pe_tiles <- function(df, title) {
   ggplot() +
-    geom_tile(data = df, mapping = aes(x = x, y = y, fill = z), color = "black", alpha = 0.8) +
-    geom_text(data = df, mapping = aes(x = x, y = y, label = z), color = "white")+ 
+    geom_tile(data = df, mapping = aes(x = x, y = y, fill = z), color = "black") +
+    geom_text(data = df, mapping = aes(x = x, y = y, label = sprintf("%.2f",z)), color = "white")+ 
     scale_x_discrete(expand = c(0, 0)) +
     scale_y_discrete(expand = c(0, 0)) +
     scale_fill_gradient(limits = c(0,1),
@@ -42,7 +43,7 @@ df_tr <- foreach(i = 1:4) %do% {
   data.frame(
     x = rep(as.factor(sd_sim), length(r_tr)),
     y = rep(as.factor(r_tr), each = length(sd_sim)),
-    z = c(t(res$wpe_tr[[i]]/1000))
+    z = round(c(t(res$wpe_tr[[i]]/1000)), 2)
   )
 }
 
@@ -50,7 +51,7 @@ df_ch <- foreach(i = 1:4) %do% {
   data.frame(
     x = rep(as.factor(sd_sim), length(r_ch)),
     y = rep(as.factor(r_ch), each = length(sd_sim)),
-    z = round(c(t(res$wpe_ch[[i]]/1000)),3)
+    z = round(c(t(res$wpe_ch[[i]]/1000)),2)
   )
 }
 
@@ -58,7 +59,7 @@ df_eq <- foreach(i = 1:4) %do% {
   data.frame(
     x = rep(as.factor(sd_sim), length(r_eq)),
     y = rep(as.factor(r_eq), each = length(sd_sim)),
-    z = c(t(res$wpe_eq[[i]]/1000))
+    z = round(c(t(res$wpe_eq[[i]]/1000)), 2)
   )
 }
 
@@ -66,7 +67,7 @@ df_eq_cc <- foreach(i = 1:4) %do% {
   data.frame(
     x = rep(as.factor(sd_sim), length(r_eq)),
     y = rep(as.factor(r_eq), each = length(sd_sim)),
-    z = round(c(t(res$wpe_eq_cc[[i]]/1000)),3)
+    z = round(c(t(res$wpe_eq_cc[[i]]/1000)),2)
   )
 }
 
@@ -74,7 +75,7 @@ df_wh <- foreach(i = 1:4) %do% {
   data.frame(
     x = as.factor(sd_sim),
     y = rep(0, length(sd_sim)),
-    z = res$wpe_wh[[i]][1,]/1000
+    z = round(res$wpe_wh[[i]][1,]/1000, 2)
   )
 }
  
@@ -101,17 +102,22 @@ g_wh <- foreach(i = 1:4) %do% {
     theme(axis.title.y = element_blank())
 }
 
-(g_tr[[1]] + g_tr[[2]]) / (g_tr[[3]] + g_tr[[4]])
+(g_tr[[1]] + g_tr[[2]]) / (g_tr[[3]] + g_tr[[4]]) +
+  plot_annotation(tag_levels = "a")
 ggsave("plot_wpe_tr.jpeg", width = 8, height = 8, units = "in")
 
-(g_ch[[1]] + g_ch[[2]]) / (g_ch[[3]] + g_ch[[4]])
+(g_ch[[1]] + g_ch[[2]]) / (g_ch[[3]] + g_ch[[4]]) +
+  plot_annotation(tag_levels = "a")
 ggsave("plot_wpe_ch.jpeg", width = 8, height = 8, units = "in")
 
-(g_eq[[1]] + g_eq[[2]]) / (g_eq[[3]] + g_eq[[4]])
+(g_eq[[1]] + g_eq[[2]]) / (g_eq[[3]] + g_eq[[4]]) +
+  plot_annotation(tag_levels = "a")
 ggsave("plot_wpe_eq.jpeg", width = 8, height = 8, units = "in")
 
-(g_eq_cc[[1]] + g_eq_cc[[2]]) / (g_eq_cc[[3]] + g_eq_cc[[4]])
+(g_eq_cc[[1]] + g_eq_cc[[2]]) / (g_eq_cc[[3]] + g_eq_cc[[4]]) +
+  plot_annotation(tag_levels = "a")
 ggsave("plot_wpe_eq_cc.jpeg", width = 8, height = 8, units = "in")
 
-(g_wh[[1]] + g_wh[[2]]) / (g_wh[[3]] + g_wh[[4]])
+(g_wh[[1]] + g_wh[[2]]) / (g_wh[[3]] + g_wh[[4]]) +
+  plot_annotation(tag_levels = "a")
 ggsave("plot_wpe_wh.jpeg", width = 8, height = 8, units = "in")
