@@ -125,6 +125,7 @@ gpdd_main4 <- filter(gpdd_main, MainID %in% gpdd_data4$MainID) %>%
   select(MainID, TaxonID, TaxonomicClass, SourceTransform) %>%
   add_column(p_wpe_wh = p_wpe_wh) %>%
   add_column(sig_wpe_wh = sig_wpe_wh) %>%
+  add_column(wpe = gpdd_wpe) %>%
   filter(TaxonomicClass %in% c("Aves", "Insecta", "Mammalia", "Osteichthyes"))
 
 df1 <- gpdd_main4 %>%
@@ -138,30 +139,34 @@ df1 <- gpdd_main4 %>%
 theme_set(theme_bw())
 
 ggplot() + 
-  geom_col(data = df1, mapping = aes(x = TaxonomicClass, y = per, fill = sig_wpe_wh), 
-           width = 0.75, position = 'dodge', alpha = 0.8) +
+  geom_col(data = df1, mapping = aes(x = factor(TaxonomicClass, levels = levels(TaxonomicClass)[4:1]), 
+                                     y = per, fill = factor(sig_wpe_wh, levels = levels(sig_wpe_wh)[3:1])), 
+           width = 0.75, position = 'dodge') +
   #geom_text(aes(x = levels(df1$TaxonomicClass), y = 1.05, 
                 #label = table(df1$TaxonomicClass)), color = "black") +
   labs(y = "Frequency") +
   theme(legend.position = "bottom",
         title = element_text(size = 18),
         legend.text = element_text(size = 14),
-        axis.title.x = element_blank(),
-        axis.title.y = element_text(size = 16),
-        axis.text.y = element_text(size = 12),
+        axis.title.y = element_blank(),
+        axis.title.x = element_text(size = 16),
+        axis.text.y = element_text(size = 16),
         axis.text.x = element_text(size = 14),
         panel.border = element_blank(),
         panel.grid.minor = element_blank(),
-        panel.grid.major.x = element_blank()) +
+        panel.grid.major.y = element_blank()) +
   scale_fill_manual(name = NULL,
                     labels = c("1" = "p > 0.05, t < 30",
                               "2" = "p > 0.05, t > 30",
                               "0" ="p < 0.05"),
                     values = c("0" = "blue4", 
                                "1" = "darkred",
-                               "2" = "darkorchid3"))
+                               "2" = "darkorchid3")) +
+  scale_y_continuous(limits = c(0, 0.6), breaks = seq(0, 0.5, 0.1)) +
+  coord_flip()
 
-ggsave("plot_gpdd.jpeg", width = 10, height = 8, units = "in")
+ggsave("plot_gpdd.pdf", width = 10, height = 8, units = "in")
+
 
 # Statistics for manuscript results
 r1 <- filter(gpdd_main4, TaxonomicClass == "Mammalia")$sig_wpe_wh %>%
@@ -188,6 +193,7 @@ ts2 <- unique(gpdd_main4$MainID)
 trends <- foreach(i = 1:length(ts2), .combine = "c") %do% {
   
   x <- filter(gpdd_data4, MainID == ts2[i])$Population
+  if (i == 743) x <- filter(gpdd_data4, MainID == ts2[i])$PopulationUntransformed
   x2 <- filter(gpdd_main4, MainID == ts2[i])
   
   if (x2$SourceTransform == "Log") x <- exp(x)
@@ -204,8 +210,8 @@ gpdd_main5 <- gpdd_main4 %>%
   add_column(trends = trends)
 
 g1 <- ggplot(data = filter(gpdd_main5, TaxonomicClass ==  "Mammalia")) +
-  geom_density_ridges(mapping = aes(x = trends, y = sig_wpe_wh), size = 1.3, alpha = 0.8, rel_min_height = 0.005) +
-  labs(y = "Density", x = "Avereage Growth (log)", title = "Mammalia") #+
+  geom_density(mapping = aes(x = trends, fill = sig_wpe_wh), size = 1.3, alpha = 0.8) +
+  labs(y = "Density", x = "Average Growth (log)", title = "Mammalia") +
   scale_fill_manual(name = NULL,
                     labels = c("1" = "p > 0.05, t < 30",
                                "2" = "p > 0.05, t > 30",
@@ -221,7 +227,7 @@ g1 <- ggplot(data = filter(gpdd_main5, TaxonomicClass ==  "Mammalia")) +
 
 g2 <- ggplot(data = filter(gpdd_main5, TaxonomicClass ==  "Aves")) +
   geom_density(mapping = aes(x = trends, fill = sig_wpe_wh), alpha = 0.8, size = 1.3) +
-  labs(y = "Density", x = "Avereage Growth (log)", title = "Aves") +
+  labs(y = "Density", x = "Average Growth (log)", title = "Aves") +
   scale_fill_manual(name = NULL,
                     labels = c("1" = "p > 0.05, t < 30",
                                "2" = "p > 0.05, t > 30",
@@ -236,7 +242,7 @@ g2 <- ggplot(data = filter(gpdd_main5, TaxonomicClass ==  "Aves")) +
 
 g3 <- ggplot(data = filter(gpdd_main5, TaxonomicClass ==  "Insecta")) +
   geom_density(mapping = aes(x = trends, fill = sig_wpe_wh), alpha = 0.8, size = 1.3) +
-  labs(y = "Density", x = "Avereage Growth (log)", title = "Insecta") +
+  labs(y = "Density", x = "Average Growth (log)", title = "Insecta") +
   scale_fill_manual(name = NULL,
                     labels = c("1" = "p > 0.05, t < 30",
                                "2" = "p > 0.05, t > 30",
@@ -251,7 +257,7 @@ g3 <- ggplot(data = filter(gpdd_main5, TaxonomicClass ==  "Insecta")) +
 
 g4 <- ggplot(data = filter(gpdd_main5, TaxonomicClass ==  "Osteichthyes")) +
   geom_density(mapping = aes(x = trends, fill = sig_wpe_wh), alpha = 0.8, size = 1.3) +
-  labs(y = "Density", x = "Avereage Growth (log)", title = "Osteichthyes") +
+  labs(y = "Density", x = "Average Growth (log)", title = "Osteichthyes") +
   scale_fill_manual(name = NULL,
                     labels = c("1" = "p > 0.05, t < 30",
                                "2" = "p > 0.05, t > 30",
@@ -281,4 +287,23 @@ ggsave("lgd.jpeg", width = 10, height = 8, units = "in")
 
 
 (g1 + g2) / (g3 + g4)
-ggsave("plot_gpdd_trends.jpeg", width = 10, height = 8, units = "in")
+ggsave("plot_gpdd_trends.pdf", width = 10, height = 8, units = "in")
+
+
+# r vs WPE
+ggplot() +
+  geom_point(aes(x = gpdd_main5$wpe, y = gpdd_main5$trends, col = gpdd_main5$sig_wpe_wh), 
+             alpha = 0.8, size = 3) +
+  scale_color_manual(name = NULL,
+                     labels = c("1" = "p > 0.05, t < 30",
+                                "2" = "p > 0.05, t > 30",
+                                "0" ="p < 0.05"),
+                     values = c("0" = "blue4", 
+                                "1" = "darkred",
+                                "2" = "darkorchid3")) +
+  labs(x = "WPE", y = "r") +
+  theme(panel.border = element_blank(),
+       panel.grid.minor = element_blank(),
+       legend.position = "bottom")
+ggsave("plot_WPEvsR.jpeg", width = 10, height = 8, units = "in")
+

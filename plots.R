@@ -103,21 +103,21 @@ g_wh <- foreach(i = 1:4) %do% {
 }
 
 (g_tr[[1]] + g_tr[[2]]) / (g_tr[[3]] + g_tr[[4]]) +
-  plot_annotation(tag_levels = "a")
+  plot_annotation(tag_levels = "a", title = "Linear Trends")
 ggsave("plot_wpe_tr.jpeg", width = 8, height = 8, units = "in")
 
 (g_ch[[1]] + g_ch[[2]]) / (g_ch[[3]] + g_ch[[4]]) +
-  plot_annotation(tag_levels = "a")
+  plot_annotation(tag_levels = "a", title = "Chaotic and Periodic Dynamics")
 ggsave("plot_wpe_ch.jpeg", width = 8, height = 8, units = "in")
 
 (g_eq[[1]] + g_eq[[2]]) / (g_eq[[3]] + g_eq[[4]]) +
-  plot_annotation(tag_levels = "a")
+  plot_annotation(tag_levels = "a", title = "Equilibrium Dynamics")
 ggsave("plot_wpe_eq.jpeg", width = 8, height = 8, units = "in")
 
 (g_eq_cc[[1]] + g_eq_cc[[2]]) / (g_eq_cc[[3]] + g_eq_cc[[4]]) +
-  plot_annotation(tag_levels = "a")
+  plot_annotation(tag_levels = "a", title = "Equilibrium Dynamics with Trend")
 ggsave("plot_wpe_eq_cc.jpeg", width = 8, height = 8, units = "in")
 
 (g_wh[[1]] + g_wh[[2]]) / (g_wh[[3]] + g_wh[[4]]) +
-  plot_annotation(tag_levels = "a")
+  plot_annotation(tag_levels = "a", title = "White Noise")
 ggsave("plot_wpe_wh.jpeg", width = 8, height = 8, units = "in")
