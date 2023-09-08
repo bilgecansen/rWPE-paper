@@ -292,7 +292,7 @@ ggsave("plot_gpdd_trends.pdf", width = 10, height = 8, units = "in")
 
 # r vs WPE
 ggplot() +
-  geom_point(aes(x = gpdd_main5$wpe, y = gpdd_main5$trends, col = gpdd_main5$sig_wpe_wh), 
+  geom_point(aes(y = gpdd_main5$wpe, x = gpdd_main5$trends, col = gpdd_main5$sig_wpe_wh), 
              alpha = 0.8, size = 3) +
   scale_color_manual(name = NULL,
                      labels = c("1" = "p > 0.05, t < 30",
@@ -301,7 +301,7 @@ ggplot() +
                      values = c("0" = "blue4", 
                                 "1" = "darkred",
                                 "2" = "darkorchid3")) +
-  labs(x = "WPE", y = "r") +
+  labs(y = "WPE", x = "r") +
   theme(panel.border = element_blank(),
        panel.grid.minor = element_blank(),
        legend.position = "bottom")

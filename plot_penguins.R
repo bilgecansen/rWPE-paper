@@ -170,23 +170,23 @@ data_pop <- readRDS("data_pop_empe.rds")
 
 # Colony level abundances
 params_N <- 
-  foreach(i = 1:40) %:% 
+  foreach(i = 1:41) %:% 
   foreach(h = 1:10, .combine = "c") %do%
   paste("N", "[", i, ",", h, "]", sep = "")
 
-N_all <- foreach(i = 1:40) %do% {
+N_all <- foreach(i = 1:41) %do% {
   MCMCsummary(res_base, params = params_N[[i]], ISB = F, exact = T)[,1]
 }
 
-wpe_empe_col <- foreach(i = 1:40) %do% {
+wpe_empe_col <- foreach(i = 1:41) %do% {
   test_wpe(log(N_all[[i]]), n_random = 1000)
 }
 
-wpe_empe_col2 <- foreach(i = 1:40, .combine = "c") %do% {
+wpe_empe_col2 <- foreach(i = 1:41, .combine = "c") %do% {
   wpe_empe_col[[i]][1]
 }
 
-wpe_empe_col3 <- foreach(i = 1:40, .combine = "c") %do% {
+wpe_empe_col3 <- foreach(i = 1:41, .combine = "c") %do% {
   wpe_empe_col[[i]][3]
 }
 
@@ -202,10 +202,10 @@ empe_site_id <- factor(empe_site_id[idx_empe], levels = empe_site_id[idx_empe])
 theme_set(theme_bw())
 
 g_col <- ggplot() +
-  geom_point(aes(x = factor(empe_site_id, levels = empe_site_id[40:1]), 
+  geom_point(aes(x = factor(empe_site_id, levels = empe_site_id[41:1]), 
                  y = wpe_empe_col2[idx_empe], col = wpe_sig_empe), size = 4) +
-  geom_segment(aes(x = factor(empe_site_id, levels = empe_site_id[40:1]), 
-                   xend = factor(empe_site_id, levels = empe_site_id[40:1]), 
+  geom_segment(aes(x = factor(empe_site_id, levels = empe_site_id[41:1]), 
+                   xend = factor(empe_site_id, levels = empe_site_id[41:1]), 
                    y = 0, yend = wpe_empe_col2[idx_empe], col = wpe_sig_empe), 
                size = 1.1) +
   scale_color_manual(name = NULL,
