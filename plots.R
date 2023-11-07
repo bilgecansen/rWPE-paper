@@ -17,7 +17,7 @@ res <- readRDS("results_sim.rds")
 
 plot_pe_tiles <- function(df, title) {
   ggplot() +
-    geom_tile(data = df, mapping = aes(x = x, y = y, fill = z), color = "black") +
+    geom_tile(data = df, mapping = aes(x = x, y = y, fill = z), color = "black", alpha = 0.75, size = 1.1) +
     geom_text(data = df, mapping = aes(x = x, y = y, label = sprintf("%.2f",z)), color = "white")+ 
     scale_x_discrete(expand = c(0, 0)) +
     scale_y_discrete(expand = c(0, 0)) +
@@ -25,7 +25,7 @@ plot_pe_tiles <- function(df, title) {
                         low = "darkred", 
                         high = "blue4") +
     labs(title = paste ("t = ", title, sep = ""), y = "r", x = bquote(sigma)) +
-    theme(panel.border = element_rect(size = 2),
+    theme(panel.border = element_rect(size = 2, color = "black"),
           axis.title.y = element_text(angle = 0, vjust = 0.5),
           axis.ticks = element_blank(),
           legend.title = element_blank(),

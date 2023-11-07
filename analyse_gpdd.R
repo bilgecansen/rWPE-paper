@@ -138,12 +138,12 @@ df1 <- gpdd_main4 %>%
 
 theme_set(theme_bw())
 
-ggplot() + 
-  geom_col(data = df1, mapping = aes(x = factor(TaxonomicClass, levels = levels(TaxonomicClass)[4:1]), 
-                                     y = per, fill = factor(sig_wpe_wh, levels = levels(sig_wpe_wh)[3:1])), 
-           width = 0.75, position = 'dodge') +
-  #geom_text(aes(x = levels(df1$TaxonomicClass), y = 1.05, 
-                #label = table(df1$TaxonomicClass)), color = "black") +
+ggplot(data = df1, mapping = aes(x = factor(TaxonomicClass, levels = levels(TaxonomicClass)[4:1]), 
+                                 y = per, 
+                                 group = factor(sig_wpe_wh, levels = levels(sig_wpe_wh)[3:1]),
+                                 fill = factor(sig_wpe_wh, levels = levels(sig_wpe_wh)[3:1]))) + 
+  geom_col(width = 0.75, position = 'dodge', size = 1.1, color = "black", alpha = 0.75) +
+  geom_label(aes(y = per + 0.025,  label = round(per, 2)), position = position_dodge(0.75), colour = "white", show.legend = F) +
   labs(y = "Frequency") +
   theme(legend.position = "bottom",
         title = element_text(size = 18),
@@ -210,7 +210,7 @@ gpdd_main5 <- gpdd_main4 %>%
   add_column(trends = trends)
 
 g1 <- ggplot(data = filter(gpdd_main5, TaxonomicClass ==  "Mammalia")) +
-  geom_density(mapping = aes(x = trends, fill = sig_wpe_wh), size = 1.3, alpha = 0.8) +
+  geom_density(mapping = aes(x = trends, fill = sig_wpe_wh), alpha = 0.6) +
   labs(y = "Density", x = "Average Growth (log)", title = "Mammalia") +
   scale_fill_manual(name = NULL,
                     labels = c("1" = "p > 0.05, t < 30",
@@ -226,7 +226,7 @@ g1 <- ggplot(data = filter(gpdd_main5, TaxonomicClass ==  "Mammalia")) +
   scale_x_continuous(breaks = c(-0.2,0,0.2,0.4,0.6))
 
 g2 <- ggplot(data = filter(gpdd_main5, TaxonomicClass ==  "Aves")) +
-  geom_density(mapping = aes(x = trends, fill = sig_wpe_wh), alpha = 0.8, size = 1.3) +
+  geom_density(mapping = aes(x = trends, fill = sig_wpe_wh), alpha = 0.6) +
   labs(y = "Density", x = "Average Growth (log)", title = "Aves") +
   scale_fill_manual(name = NULL,
                     labels = c("1" = "p > 0.05, t < 30",
@@ -241,7 +241,7 @@ g2 <- ggplot(data = filter(gpdd_main5, TaxonomicClass ==  "Aves")) +
   scale_y_continuous(breaks = c(0,6,12), limits = c(0,15))
 
 g3 <- ggplot(data = filter(gpdd_main5, TaxonomicClass ==  "Insecta")) +
-  geom_density(mapping = aes(x = trends, fill = sig_wpe_wh), alpha = 0.8, size = 1.3) +
+  geom_density(mapping = aes(x = trends, fill = sig_wpe_wh), alpha = 0.6) +
   labs(y = "Density", x = "Average Growth (log)", title = "Insecta") +
   scale_fill_manual(name = NULL,
                     labels = c("1" = "p > 0.05, t < 30",
@@ -256,7 +256,7 @@ g3 <- ggplot(data = filter(gpdd_main5, TaxonomicClass ==  "Insecta")) +
   scale_x_continuous(breaks = c(-0.4, -0.2,0,0.2,0.4,0.6))
 
 g4 <- ggplot(data = filter(gpdd_main5, TaxonomicClass ==  "Osteichthyes")) +
-  geom_density(mapping = aes(x = trends, fill = sig_wpe_wh), alpha = 0.8, size = 1.3) +
+  geom_density(mapping = aes(x = trends, fill = sig_wpe_wh), alpha = 0.6) +
   labs(y = "Density", x = "Average Growth (log)", title = "Osteichthyes") +
   scale_fill_manual(name = NULL,
                     labels = c("1" = "p > 0.05, t < 30",
@@ -271,7 +271,7 @@ g4 <- ggplot(data = filter(gpdd_main5, TaxonomicClass ==  "Osteichthyes")) +
   scale_y_continuous(breaks = c(0,3,6))
 
 ggplot(data = filter(gpdd_main5, TaxonomicClass ==  "Mammalia")) +
-  geom_density(mapping = aes(x = trends, fill = sig_wpe_wh), size = 1.3, alpha = 0.8) +
+  geom_density(mapping = aes(x = trends, fill = sig_wpe_wh), alpha = 0.75) +
   labs(y = "Density", x = "Avereage Growth (log)") +
   scale_fill_manual(name = NULL,
                     labels = c("1" = "p > 0.05, t < 30",
