@@ -7,6 +7,9 @@ library(patchwork)
 source("functions_pe.R")
 source("functions_pop.R")
 
+# Please obtain this data from supplementary information of Rogers et al. (2022). 
+# Full reference is in the main text of the manuscript
+
 dat_rogers <- read.csv("rogers_simulation_dataset_test.csv")
 
 dat_pr_25 <- filter(dat_rogers, Classification == "periodic" & TimeSeriesLength == 25)
