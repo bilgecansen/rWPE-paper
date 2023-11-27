@@ -1,9 +1,12 @@
 
 library(foreach)
 library(doSNOW)
+library(tidyverse)
 
 source("functions_pe.R")
 source("fit_pe.R")
+
+dat_rogers <- read.csv("rogers_simulation_dataset_test.csv")
 
 dat_pr_50 <- filter(dat_rogers, Classification == "periodic" & TimeSeriesLength == 50)
 id_pr_50 <- dat_pr_50$ID %>% unique()
