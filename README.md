@@ -1,4 +1,4 @@
-**Scripts for using rWPE on simulated and empirical data (in review at MEE)**
+### **Scripts for using rWPE on simulated and empirical data (in review at MEE)**
 
 All scripts use the functions in the scripts below:
 
@@ -6,7 +6,8 @@ All scripts use the functions in the scripts below:
 
 **functions_pop.R**: Functions to run Ricker population simulations.
 
-Main Scripts
+
+#### Main Scripts
 
 **sc1_simulations.R**: Runs Ricker population simulations and apples rWPE.
 
