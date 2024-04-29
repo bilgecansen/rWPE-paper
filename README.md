@@ -6,6 +6,8 @@ All scripts use the functions in the scripts below:
 
 **functions_pop.R**: Functions to run Ricker population simulations.
 
+Main Scripts
+
 **sc1_simulations.R**: Runs Ricker population simulations and apples rWPE.
 
 **sc2_analyse_rogers.R**: Applies rWPE to test data published at Rogers et al. (2022) and plots the results.
