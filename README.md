@@ -1,4 +1,4 @@
-### **Scripts for using rWPE on simulated and empirical data (in review at MEE)**
+### **Scripts for using rWPE on simulated and empirical data (in publication at MEE)**
 
 All scripts use the functions in the scripts below:
 
