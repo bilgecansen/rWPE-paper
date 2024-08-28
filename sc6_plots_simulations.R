@@ -34,7 +34,9 @@ plot_pe_tiles <- function(df, title) {
           legend.title = element_blank(),
           legend.position = "none",
           panel.grid.minor = element_blank(),
-          panel.grid.major = element_blank())
+          panel.grid.major = element_blank(),
+          axis.text = element_text(size = 12),
+          axis.title = element_text(size = 16))
 }
 
 
@@ -107,20 +109,25 @@ g_wh <- foreach(i = 1:4) %do% {
 
 (g_tr[[1]] + g_tr[[2]]) / (g_tr[[3]] + g_tr[[4]]) +
   plot_annotation(tag_levels = "a", title = "Linear Trends")
-ggsave("figures/plot_wpe_tr.pdf", width = 180, height = 180, units = "mm")
+ggsave("figures/plot_wpe_tr.pdf", width = 180, height = 180, units = "mm",
+       dpi = 600)
 
 (g_ch[[1]] + g_ch[[2]]) / (g_ch[[3]] + g_ch[[4]]) +
   plot_annotation(tag_levels = "a", title = "Chaotic and Periodic Dynamics")
-ggsave("figures/plot_wpe_ch.pdf", width = 180, height = 180, units = "mm")
+ggsave("figures/plot_wpe_ch.pdf", width = 180, height = 180, units = "mm",
+       dpi = 600)
 
 (g_eq[[1]] + g_eq[[2]]) / (g_eq[[3]] + g_eq[[4]]) +
   plot_annotation(tag_levels = "a", title = "Equilibrium Dynamics")
-ggsave("figures/plot_wpe_eq.pdf", width = 180, height = 180, units = "mm")
+ggsave("figures/plot_wpe_eq.pdf", width = 180, height = 180, units = "mm",
+       dpi = 600)
 
 (g_eq_cc[[1]] + g_eq_cc[[2]]) / (g_eq_cc[[3]] + g_eq_cc[[4]]) +
   plot_annotation(tag_levels = "a", title = "Equilibrium Dynamics with Trend")
-ggsave("figures/plot_wpe_eq_cc.pdf",width = 180, height = 180, units = "mm")
+ggsave("figures/plot_wpe_eq_cc.pdf",width = 180, height = 180, units = "mm",
+       dpi = 600)
 
 (g_wh[[1]] + g_wh[[2]]) / (g_wh[[3]] + g_wh[[4]]) +
   plot_annotation(tag_levels = "a", title = "White Noise")
-ggsave("figures/plot_wpe_wh.pdf", width = 180, height = 180, units = "mm")
+ggsave("figures/plot_wpe_wh.pdf", width = 180, height = 180, units = "mm",
+       dpi = 600)

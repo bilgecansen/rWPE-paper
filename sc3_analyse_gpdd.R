@@ -150,18 +150,18 @@ g_gpdd1 <- ggplot(data = df1,
                         fill = factor(sig_wpe_wh, levels = levels(sig_wpe_wh)[3:1]))) + 
   geom_col(width = 0.75, position = 'dodge', size = 0.5, color = "black", 
            alpha = 0.75) +
-  geom_label(aes(y = per + 0.03,  label = round(per, 2)), size = 2, 
+  geom_label(aes(y = per + 0.05,  label = round(per, 2)), size = 3, 
              position = position_dodge(0.75), colour = "white", 
              show.legend = F) +
   labs(y = "Frequency") +
   theme(legend.position = "bottom",
         legend.key.size = unit(3, "mm"),
         title = element_text(size = 10),
-        legend.text = element_text(size = 8),
+        legend.text = element_text(size = 10),
         axis.title.y = element_blank(),
-        axis.title.x = element_text(size = 8),
-        axis.text.y = element_text(size = 8),
-        axis.text.x = element_text(size = 8),
+        axis.title.x = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
+        axis.text.x = element_text(size = 10),
         panel.border = element_blank(),
         panel.grid.minor = element_blank(),
         panel.grid.major.y = element_blank()) +
@@ -185,23 +185,23 @@ g_gpdd2 <- ggplot() +
                                "1" = "darkred",
                                "2" = "darkorchid3")) +
   scale_y_continuous(breaks = seq(0, 1, 0.2)) +
-  scale_x_discrete(labels = c("1" = "p > 0.05, t < 30",
-                              "2" = "p > 0.05, t > 30",
+  scale_x_discrete(labels = c("1" = "p > 0.05,\n t < 30",
+                              "2" = "p > 0.05,\n t > 30",
                               "0" ="p < 0.05")) +
   theme(legend.position = "none",
         title = element_text(size = 10),
         legend.text = element_text(size = 8),
         axis.title.x = element_blank(),
-        axis.title.y = element_text(size = 8),
-        axis.text.y = element_text(size = 8),
-        axis.text.x = element_text(size = 6),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
+        axis.text.x = element_text(size = 10),
         panel.border = element_blank(),
         panel.grid.minor = element_blank())
 
 g_gpdd2 + g_gpdd1 +
   plot_annotation(tag_levels = "a") +
   plot_layout(widths = c(0.7, 1))
-ggsave("figures/plot_gpdd.pdf", width = 180, height = 90, units = "mm",
+ggsave("figures/plot_gpdd.pdf", width = 180, height = 120, units = "mm",
        dpi = 600)
 
 # Statistics for manuscript results
