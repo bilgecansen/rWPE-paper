@@ -121,8 +121,8 @@ g_base <- ggplot() +
         title = element_text(size = 12),
         legend.text = element_text(size = 14),
         axis.title.y = element_blank(),
-        axis.title.x = element_text(size = 16),
-        axis.text.y = element_text(size = 12),
+        axis.title.x = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
         axis.text.x = element_text(size = 10),
         panel.border = element_blank(),
         panel.grid.major = element_blank(),
@@ -134,13 +134,13 @@ g_quad <- ggplot() +
                           y = z2$value,
                           group = z2$iter), alpha = 0.2) +
   geom_point(mapping = aes(x = ice$aice_avg[-idx_wpe], 
-                           y = mu_r[-idx_wpe]), size = 4, alpha = 0.9, col = "grey") +
+                           y = mu_r[-idx_wpe]), size = 3, alpha = 0.9, col = "grey") +
   geom_point(mapping = aes(x = ice$aice_avg[-idx_wpe], 
-                           y = mu_r[-idx_wpe]), size = 4, shape =  1, col = "black") +
+                           y = mu_r[-idx_wpe]), size = 3, shape =  1, col = "black") +
   geom_point(mapping = aes(x = ice$aice_avg[idx_wpe], 
-                           y = mu_r[idx_wpe], col = wpe_sig), size = 6, alpha = 0.8) +
+                           y = mu_r[idx_wpe], col = wpe_sig), size = 4, alpha = 0.8) +
   geom_point(mapping = aes(x = ice$aice_avg[idx_wpe], 
-                           y = mu_r[idx_wpe]), size = 6, shape = 1, col = "black") +
+                           y = mu_r[idx_wpe]), size = 4, shape = 1, col = "black") +
   #scale_y_continuous(limits = c(-0.07, 0.05)) +
   scale_color_manual(name = NULL,
                      labels = c("0" = "p > 0.05",
@@ -151,10 +151,10 @@ g_quad <- ggplot() +
   theme(legend.position = "none",
         title = element_text(size = 12),
         legend.text = element_text(size = 14),
-        axis.title.x = element_text(size = 16),
-        axis.title.y = element_text(size = 16),
-        axis.text.y = element_text(size = 12),
-        axis.text.x = element_text(size = 16),
+        axis.title.x = element_text(size = 12),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
+        axis.text.x = element_text(size = 10),
         panel.border = element_blank(),
         panel.grid.minor = element_blank())
 
@@ -218,8 +218,8 @@ g_col <- ggplot() +
         title = element_text(size = 12),
         legend.text = element_text(size = 14),
         axis.title.y = element_blank(),
-        axis.title.x = element_text(size = 16),
-        axis.text.y = element_text(size = 10),
+        axis.title.x = element_text(size = 12),
+        axis.text.y = element_text(size = 8),
         axis.text.x = element_text(size = 10),
         panel.border = element_blank(),
         panel.grid.major = element_blank(),
@@ -235,7 +235,7 @@ g_col <- ggplot() +
 ((g_base / g_quad) | g_col) + 
   plot_annotation(tag_levels = "a")
 
-ggsave("plot_penguin.pdf", width = 12, height = 10, units = "in") 
+ggsave("figures/plot_penguin.pdf", width = 180, height = 180, units = "mm") 
 
 # to extract the legend
 g_legend <- ggplot() +

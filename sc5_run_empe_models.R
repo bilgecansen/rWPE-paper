@@ -21,7 +21,7 @@ data_pop <- readRDS("data_penguin/data_pop_empe.rds")
 
 data_stan_base <- readRDS("data_penguin/data_stan_empe.rds")
 
-res_base <- stan(file = "model_base_site.stan",
+res_base <- stan(file = "data_penguin/model_base_site.stan",
                  data = data_stan_base,
                  chains = 4,
                  cores = 4,
@@ -83,5 +83,5 @@ g_col <- ggplot() +
         panel.grid.minor = element_blank())
 
 g_col
-ggsave("plot_empe.jpeg", width = 10, height = 6, units = "in")  
+#ggsave("plot_empe.jpeg", width = 10, height = 6, units = "in")  
 

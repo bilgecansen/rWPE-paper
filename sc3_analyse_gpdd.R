@@ -143,31 +143,32 @@ df1 <- gpdd_main4 %>%
 theme_set(theme_bw())
 
 g_gpdd1 <- ggplot(data = df1, 
-       mapping = 
-         aes(x = factor(TaxonomicClass, levels = levels(TaxonomicClass)[4:1]), 
-             y = per, 
-             group = factor(sig_wpe_wh, levels = levels(sig_wpe_wh)[3:1]),
-             fill = factor(sig_wpe_wh, levels = levels(sig_wpe_wh)[3:1]))) + 
-  geom_col(width = 0.75, position = 'dodge', size = 1.1, color = "black", 
+                  mapping = 
+                    aes(x = factor(TaxonomicClass, levels = levels(TaxonomicClass)[4:1]), 
+                        y = per, 
+                        group = factor(sig_wpe_wh, levels = levels(sig_wpe_wh)[3:1]),
+                        fill = factor(sig_wpe_wh, levels = levels(sig_wpe_wh)[3:1]))) + 
+  geom_col(width = 0.75, position = 'dodge', size = 0.5, color = "black", 
            alpha = 0.75) +
-  geom_label(aes(y = per + 0.025,  label = round(per, 2)), 
+  geom_label(aes(y = per + 0.03,  label = round(per, 2)), size = 2, 
              position = position_dodge(0.75), colour = "white", 
              show.legend = F) +
   labs(y = "Frequency") +
   theme(legend.position = "bottom",
-        title = element_text(size = 18),
-        legend.text = element_text(size = 14),
+        legend.key.size = unit(3, "mm"),
+        title = element_text(size = 10),
+        legend.text = element_text(size = 8),
         axis.title.y = element_blank(),
-        axis.title.x = element_text(size = 16),
-        axis.text.y = element_text(size = 16),
-        axis.text.x = element_text(size = 14),
+        axis.title.x = element_text(size = 8),
+        axis.text.y = element_text(size = 8),
+        axis.text.x = element_text(size = 8),
         panel.border = element_blank(),
         panel.grid.minor = element_blank(),
         panel.grid.major.y = element_blank()) +
   scale_fill_manual(name = NULL,
                     labels = c("1" = "p > 0.05, t < 30",
-                              "2" = "p > 0.05, t > 30",
-                              "0" ="p < 0.05"),
+                               "2" = "p > 0.05, t > 30",
+                               "0" ="p < 0.05"),
                     values = c("0" = "blue4", 
                                "1" = "darkred",
                                "2" = "darkorchid3")) +
@@ -176,9 +177,9 @@ g_gpdd1 <- ggplot(data = df1,
 
 g_gpdd2 <- ggplot() +
   #geom_jitter(aes(y = gpdd_wpe, x = sig_wpe_wh), alpha = 0.5, 
-              #width = 0.15) +
+  #width = 0.15) +
   geom_violin(aes(y = gpdd_wpe, x = sig_wpe_wh, fill = sig_wpe_wh),
-              alpha = 0.75, linewidth = 1.1) +
+              alpha = 0.75, linewidth = 0.5) +
   labs(y = "WPE") +
   scale_fill_manual(values = c("0" = "blue4", 
                                "1" = "darkred",
@@ -188,21 +189,20 @@ g_gpdd2 <- ggplot() +
                               "2" = "p > 0.05, t > 30",
                               "0" ="p < 0.05")) +
   theme(legend.position = "none",
-        title = element_text(size = 18),
-        legend.text = element_text(size = 14),
+        title = element_text(size = 10),
+        legend.text = element_text(size = 8),
         axis.title.x = element_blank(),
-        axis.title.y = element_text(size = 16),
-        axis.text.y = element_text(size = 16),
-        axis.text.x = element_text(size = 14),
+        axis.title.y = element_text(size = 8),
+        axis.text.y = element_text(size = 8),
+        axis.text.x = element_text(size = 6),
         panel.border = element_blank(),
         panel.grid.minor = element_blank())
-
 
 g_gpdd2 + g_gpdd1 +
   plot_annotation(tag_levels = "a") +
   plot_layout(widths = c(0.7, 1))
-ggsave("plot_gpdd.pdf", width = 17, height = 8, units = "in")
-
+ggsave("figures/plot_gpdd.pdf", width = 180, height = 90, units = "mm",
+       dpi = 600)
 
 # Statistics for manuscript results
 r1 <- filter(gpdd_main4, TaxonomicClass == "Mammalia")$sig_wpe_wh %>%

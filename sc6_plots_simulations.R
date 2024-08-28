@@ -17,8 +17,11 @@ res <- readRDS("results/results_sim.rds")
 
 plot_pe_tiles <- function(df, title) {
   ggplot() +
-    geom_tile(data = df, mapping = aes(x = x, y = y, fill = z), color = "black", alpha = 0.75, size = 1.1) +
-    geom_text(data = df, mapping = aes(x = x, y = y, label = sprintf("%.2f",z)), color = "white")+ 
+    geom_tile(data = df, mapping = aes(x = x, y = y, fill = z), 
+              color = "black", alpha = 0.75, size = 0.5) +
+    geom_text(data = df, 
+              mapping = aes(x = x, y = y, label = sprintf("%.2f",z)), 
+              color = "white")+ 
     scale_x_discrete(expand = c(0, 0)) +
     scale_y_discrete(expand = c(0, 0)) +
     scale_fill_gradient(limits = c(0,1),
@@ -104,20 +107,20 @@ g_wh <- foreach(i = 1:4) %do% {
 
 (g_tr[[1]] + g_tr[[2]]) / (g_tr[[3]] + g_tr[[4]]) +
   plot_annotation(tag_levels = "a", title = "Linear Trends")
-ggsave("plot_wpe_tr.jpeg", width = 8, height = 8, units = "in")
+ggsave("figures/plot_wpe_tr.pdf", width = 180, height = 180, units = "mm")
 
 (g_ch[[1]] + g_ch[[2]]) / (g_ch[[3]] + g_ch[[4]]) +
   plot_annotation(tag_levels = "a", title = "Chaotic and Periodic Dynamics")
-ggsave("plot_wpe_ch.jpeg", width = 8, height = 8, units = "in")
+ggsave("figures/plot_wpe_ch.pdf", width = 180, height = 180, units = "mm")
 
 (g_eq[[1]] + g_eq[[2]]) / (g_eq[[3]] + g_eq[[4]]) +
   plot_annotation(tag_levels = "a", title = "Equilibrium Dynamics")
-ggsave("plot_wpe_eq.jpeg", width = 8, height = 8, units = "in")
+ggsave("figures/plot_wpe_eq.pdf", width = 180, height = 180, units = "mm")
 
 (g_eq_cc[[1]] + g_eq_cc[[2]]) / (g_eq_cc[[3]] + g_eq_cc[[4]]) +
   plot_annotation(tag_levels = "a", title = "Equilibrium Dynamics with Trend")
-ggsave("plot_wpe_eq_cc.jpeg", width = 8, height = 8, units = "in")
+ggsave("figures/plot_wpe_eq_cc.pdf",width = 180, height = 180, units = "mm")
 
 (g_wh[[1]] + g_wh[[2]]) / (g_wh[[3]] + g_wh[[4]]) +
   plot_annotation(tag_levels = "a", title = "White Noise")
-ggsave("plot_wpe_wh.jpeg", width = 8, height = 8, units = "in")
+ggsave("figures/plot_wpe_wh.pdf", width = 180, height = 180, units = "mm")
